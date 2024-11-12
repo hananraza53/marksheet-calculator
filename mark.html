@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Mark Sheet Calculator</title>
+</head>
+<body class="bg-gradient-to-r from-blue-100 via-blue-200 to-blue-300 p-10">
+
+    <div class="max-w-4xl mx-auto bg-white p-8 rounded-lg shadow-xl border-2 border-blue-300">
+        <h1 class="text-4xl font-semibold text-center text-blue-600 mb-6">Mark Sheet Calculator</h1>
+
+        <form id="marksForm">
+            <div id="subjectsContainer" class="space-y-4 mb-6">
+                <!-- Subject Fields -->
+                <div class="subject-input">
+                    <label for="subject1" class="block text-lg font-medium text-gray-700">Subject 1:</label>
+                    <input type="number" id="subject1" class="subject-input-field w-full p-3 border-2 border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="Enter marks" required>
+                </div>
+                <div class="subject-input">
+                    <label for="subject2" class="block text-lg font-medium text-gray-700">Subject 2:</label>
+                    <input type="number" id="subject2" class="subject-input-field w-full p-3 border-2 border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="Enter marks" required>
+                </div>
+                <div class="subject-input">
+                    <label for="subject3" class="block text-lg font-medium text-gray-700">Subject 3:</label>
+                    <input type="number" id="subject3" class="subject-input-field w-full p-3 border-2 border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="Enter marks" required>
+                </div>
+                <div class="subject-input">
+                    <label for="subject4" class="block text-lg font-medium text-gray-700">Subject 4:</label>
+                    <input type="number" id="subject4" class="subject-input-field w-full p-3 border-2 border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="Enter marks" required>
+                </div>
+                <div class="subject-input">
+                    <label for="subject5" class="block text-lg font-medium text-gray-700">Subject 5:</label>
+                    <input type="number" id="subject5" class="subject-input-field w-full p-3 border-2 border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="Enter marks" required>
+                </div>
+                <div class="subject-input">
+                    <label for="subject6" class="block text-lg font-medium text-gray-700">Subject 6:</label>
+                    <input type="number" id="subject6" class="subject-input-field w-full p-3 border-2 border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="Enter marks" required>
+                </div>
+            </div>
+
+            <button type="submit" class="w-full bg-gradient-to-r from-green-400 via-teal-400 to-blue-500 text-white p-3 rounded-lg font-semibold hover:from-green-500 hover:to-blue-600 transition duration-300">Calculate</button>
+        </form>
+
+        <div id="result" class="mt-6 hidden bg-gray-100 p-6 rounded-lg shadow-lg border-2 border-blue-200">
+            <h2 class="text-2xl font-semibold text-blue-600">Result</h2>
+            <div class="mt-4 space-y-2">
+                <p id="totalMarks" class="text-lg font-medium text-gray-800"></p>
+                <p id="percentage" class="text-lg font-medium text-gray-800"></p>
+                <p id="status" class="text-lg font-medium"></p>
+                <p id="grade" class="text-lg font-medium"></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('marksForm');
+        const resultDiv = document.getElementById('result');
+        const totalMarksDisplay = document.getElementById('totalMarks');
+        const percentageDisplay = document.getElementById('percentage');
+        const statusDisplay = document.getElementById('status');
+        const gradeDisplay = document.getElementById('grade');
+
+        form.addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            // Collect the marks from all the subject fields
+            const subjects = [];
+            for (let i = 1; i <= 6; i++) {
+                const subjectInput = document.getElementById(`subject${i}`);
+                const mark = parseInt(subjectInput.value);
+                subjects.push(mark);
+            }
+
+            // Validate input
+            let valid = true;
+            subjects.forEach((mark, i) => {
+                if (isNaN(mark) || mark < 0 || mark > 100) {
+                    valid = false;
+                    document.getElementById(`subject${i + 1}`).classList.add('border-red-500');
+                    document.getElementById(`subject${i + 1}`).classList.remove('border-gray-300');
+                } else {
+                    document.getElementById(`subject${i + 1}`).classList.add('border-gray-300');
+                    document.getElementById(`subject${i + 1}`).classList.remove('border-red-500');
+                }
+            });
+
+            if (!valid) {
+                alert("Please enter valid marks (0 to 100) for all subjects.");
+                return;
+            }
+
+            // Calculate total marks, percentage, and pass/fail status
+            const totalMarks = subjects.reduce((acc, mark) => acc + mark, 0);
+            const maxMarks = 600; // 6 subjects * 100 max marks
+            const percentage = (totalMarks / maxMarks) * 100;
+
+            // Determine pass/fail status
+            const passingMarks = 40;
+            const passedAllSubjects = subjects.every(mark => mark >= passingMarks);
+            const status = passedAllSubjects ? "Passed" : "Failed";
+
+            // Calculate grade based on percentage
+            let grade = '';
+            if (percentage >= 90) grade = 'A';
+            else if (percentage >= 75) grade = 'B';
+            else if (percentage >= 60) grade = 'C';
+            else if (percentage >= 50) grade = 'D';
+            else grade = 'F';
+
+            // Display results
+            totalMarksDisplay.textContent = `Total Marks: ${totalMarks} / ${maxMarks}`;
+            percentageDisplay.textContent = `Percentage: ${percentage.toFixed(2)}%`;
+            statusDisplay.textContent = `Status: ${status}`;
+            gradeDisplay.textContent = `Grade: ${grade}`;
+
+            // Change status color based on pass/fail
+            if (passedAllSubjects) {
+                statusDisplay.classList.add('text-green-500');
+                statusDisplay.classList.remove('text-red-500');
+            } else {
+                statusDisplay.classList.add('text-red-500');
+                statusDisplay.classList.remove('text-green-500');
+            }
+
+            // Change grade color based on grade
+            if (grade === 'A') {
+                gradeDisplay.classList.add('text-green-500');
+            } else if (grade === 'B') {
+                gradeDisplay.classList.add('text-blue-500');
+            } else if (grade === 'C') {
+                gradeDisplay.classList.add('text-yellow-500');
+            } else if (grade === 'D') {
+                gradeDisplay.classList.add('text-orange-500');
+            } else {
+                gradeDisplay.classList.add('text-red-500');
+            }
+
+            resultDiv.classList.remove('hidden');
+        });
+    </script>
+</body>
+</html>
